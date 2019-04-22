@@ -5,8 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "aviao.h"
+
+aeronave *new_aeronave; // deixa um ponteiro para a aeronave
 
 typedef struct _no{
+	char _prefixo[100];
 	char _aeroOrigem[100];
 	char _aeroDestino[100];
 	char _siglaOrigem[3];
@@ -18,222 +22,266 @@ typedef struct _no{
 	int _horaDuracaoVoo;
 	int _minDuracaoVoo;
 	struct _no *prox;
-}aeroporto;
+}voo; // struct com informações de voo
 
-int _vazia (aeroporto *a){
-    return (a == NULL);
+int _vazia (voo *a){
+    return (a == NULL); // verifica se a lista é vazia
 }
 
 void ver_horario(int *HoraP, int *MinP, int *HoraC, int *MinC){
-    int aux1, aux2, aux3, aux4;
-    aux1 = *HoraP;
+    int aux1, aux2, aux3, aux4; // auxiliares de parametro
+    aux1 = *HoraP; 
     aux2 = *MinP;
     aux3 = *HoraC;
     aux4 = *MinC;
 
-    while((aux1<0 || aux1>23) || (aux2<0 || aux2>59)){
+    while((aux1<0 || aux1>23) || (aux2<0 || aux2>59)){ // ve se o horario é correto e aceitavel
         printf("Horario de saida invalido, insira outro:\n");
-        scanf("%d%*c%d", &aux1, &aux2);
+        scanf("%d%*c%d", &aux1, &aux2); // troca o valor das variaveis auxiliares
     }
 
-    while((aux3<0 || aux3>23) || (aux4<0 || aux4>59)){
+    while((aux3<0 || aux3>23) || (aux4<0 || aux4>59)){ // ve se o horario é correto e aceitavel
         printf("Horario de chegada invalido, insira outro:\n");
-        scanf("%d%*c%d", &aux3, &aux4);
+        scanf("%d%*c%d", &aux3, &aux4); // troca o valor das variaveis auxiliares
     }
 
-    *HoraP = aux1;
+    *HoraP = aux1; // muda o valor das variaveis originais
     *MinP = aux2;
     *HoraC = aux3;
     *HoraP = aux4;
 }
 
 void tempo_voo(int HoraDu, int MinDu, int HoraP, int MinP, int HoraC, int MinC){
-	int auxHora, auxMin;
+	int auxHora, auxMin; // auxiliares de parametro
 
 	if(MinP + MinC > 59){
-		HoraDu++;
+		HoraDu++; // aumenta a hora conforme os minutos
 		auxMin = MinP + MinC;
-		auxMin %= 60;
+		auxMin %= 60; // faz os minutos restantes corresponderem de acordo
 	}
 
-	auxHora = HoraP + HoraC;
-	HoraDu = auxHora;
-	MinDu = auxMin;
+	auxHora = HoraP - HoraC; // da a quantidade de horas de voo 
+	HoraDu = auxHora; // atualiza a variavel original
+	MinDu = auxMin; // atualiza a variavel original
 }
 
-void valida_Sigla(char a[]){
+void valida_Sigla(char str[]){
 	int i,j;
-	char auxS[3];
-	
-	for(i = 0, j = 0; i < strlen(a); i++){
-		if(isalpha(a[i])){
-			
-			if(islower(a[i])){
-				a[i] = toupper(a[i]);
+	char aux[100];
+
+	strcpy(aux, str);
+	for (i = 0, j = 0; i < strlen(str); i++) {	
+		if(isalpha(str[i])) {
+
+			if(islower(str[i])){
+				str[i] = toupper(str[i]);
+				j++;
+			}else
+
+			if(isupper(str[i])){
 				j++;
 			}
-
-			if(isupper(a[i])){
-				j++;
-			}
+		} else 
+		if(isdigit(str[i]) == 1) {
+			printf("sigla errada, por favor coloque novamente\n");
+			scanf("%[^\n]%*c", str);
+			valida_Sigla(str); 
 		}
-
-		else if(isdigit(a[i])){
-			system("cls");
-			printf("Sigla Invalida, Sigla Apenas com Letras: \n");
-			printf("Por Favor Coloque Novamente: \n");
-			printf("_ ");
-			fflush(stdin);
-			scanf("%[^\n]%*c", &auxS);
-			valida_Sigla(auxS);
+		strcpy(aux, str);
 		}
-	}
-
-	if(j > 3){
-		system("cls");
-		printf("Sigla Invalida, Sigla Apenas com Letras: \n");
-		printf("Por Favor Coloque Novamente: \n");
-		printf("_ ");
-		scanf("%[^\n]%*c", &auxS);
-		fflush(stdin);
-		valida_Sigla(auxS);
-	}
-
-	strcpy(a, "");
 	
-	for(i = 0; i < 3; i++){
-		a[i] = auxS[i];
+	if (j < 3 || j > 3) {
+		printf("quantidade de letras erradas\n");
+		scanf("%[^\n]%*c", str);
+		valida_Sigla(str);
 	}
-	
-	a[strlen(auxS)+1] = '\0';
 }
 
 void compara_Aeroporto(char a[], char b[]){
-	int i;
-	char auxA[100], auxB[100];
-	char siglaDestino[3], siglaOrigem[3];
+	char auxA[100], auxB[100]; // vetores de parametro e troca de aeroporto
 
-	if(strcmp(a,b) == 0){
+	if(strcmp(a,b) == 1){ // verifica se os aeroportos sao iguais
 		system("cls");
 		printf("Aeroportos Iguais, por favor coloque outros: \n\n");
 		
 		printf("Inserir Aeroporto de Origem: \n");
    		printf("_ ");
-   		scanf("%[^\n]%*c", auxA);
-
-   		system("cls");
-	   	printf("Sigla (apenas 3 Digitos e Maiusculo): \n");
-   		printf("_ ");
    		fflush(stdin);
-   		scanf("%[^\n]%*c", siglaOrigem);
-   		valida_Sigla(siglaOrigem);
+   		scanf("%[^\n]%*c", auxA); // atualiza a vetor auxiliar
 
    		system("cls");
    		printf("Inserir Aeroporto de Destino: \n");
    		printf("_ ");
-   		scanf("%[^\n]%*c", auxB);
-   		compara_Aeroporto(auxA, auxB);
-
-   		system("cls");
- 	  	printf("Sigla (Apenas 3 Digitos e Maiusculo): \n");
-   		printf("_ ");
    		fflush(stdin);
-   		scanf("%[^\n]%*c", siglaDestino);
-   		valida_Sigla(siglaDestino);
-	}
-	
-	strcpy(a, "");
-	for(i = 0; i < strlen(auxA); i++){
-		a[i] = auxA[i];
-	}
-	a[strlen(a)+1] = '\0';
+   		scanf("%[^\n]%*c", auxB); // atualiza a vetor auxilia
 
-	strcpy(b, "");
-	for(i = 0; i < strlen(auxA); i++){
-		b[i] = auxB[i];
-	}
-	b[strlen(b)+1] = '\0';
+	} else
+	
+	compara_Aeroporto(auxA, auxB); // recursivamente verifica se os aeroportos são iguais
+	strcpy(a, auxA);
+	strcpy(b, auxB);
 }
 
-aeroporto * cadastra_porto(aeroporto *a){
+voo * cadastra_porto(voo *a){
+   	setlocale(LC_ALL, "Portuguese");
    	int i;
    	int horaPartida, minutoPartida;
    	int horaChegada, minutoChegada;
    	int horaDuracaoVoo, minDuracaoVoo;
-   	char aeroOrigem[100], siglaOrigem[3];
-   	char aeroDestino[100], siglaDestino[3];
+   	char aeroOrigem[100], siglaOrigem[5];
+   	char aeroDestino[100], siglaDestino[5];
+   	// variaveis auxiliares de comparação e atualização
 
    	system("cls");
    	printf("Inserir Aeroporto de Origem: \n");
    	printf("_ ");
    	fflush(stdin);
-   	scanf("%[^\n]%*c", aeroOrigem);
+   	scanf("%[^\n]%*c", aeroOrigem); // atualiza o vetor auxilia
+   	printf("aeroporto origem: %s\n", aeroOrigem);
+   	getchar();
    
    	system("cls");
    	printf("Sigla (apenas 3 Digitos e Maiusculo): \n");
    	printf("_ ");
    	fflush(stdin);
-   	scanf("%[^\n]%*c", siglaOrigem);
-   	valida_Sigla(siglaOrigem);
+   	scanf("%[^\n]%*c", siglaOrigem); // atualiza o vetor auxiliar
+   	valida_Sigla(siglaOrigem); // verifica se a sigla é aceitavel
+   	printf("sigla: %s\n", siglaOrigem);
+   	getchar();
 
    	system("cls");
    	printf("Inserir Aeroporto de Destino: \n");
    	printf("_ ");
    	fflush(stdin);
-   	scanf("%[^\n]%*c", aeroDestino);
+   	scanf("%[^\n]%*c", aeroDestino); // atualiza o vetor auxiliar
+   	printf("aeroporto de destino: %s\n", aeroDestino);
+   	getchar();
    
    	system("cls");
    	printf("Sigla (Apenas 3 Digitos e Maiusculo): \n");
    	printf("_ ");
    	fflush(stdin);
-   	scanf("%[^\n]%*c", siglaDestino);
-   	valida_Sigla(siglaDestino);
+   	scanf("%[^\n]%*c", siglaDestino); // atualiza o vetor auxiliar
+   	valida_Sigla(siglaDestino); // verifica se a sigla é aceitavel
+   	printf("sigla de destino: %s\n", siglaDestino);
+   	getchar();
 
-   	//compara_Aeroporto(aeroOrigem, aeroDestino);
+   	compara_Aeroporto(aeroOrigem, aeroDestino);
+   	printf("aeroporto de origem: %s\n", aeroOrigem);
+   	printf("aeroporto de destino: %s\n", aeroDestino);
+   	getchar();
    	fflush(stdin);
 
-   	for(i = 0; i < strlen(aeroOrigem); i++){
-   		a->_aeroOrigem[i] == aeroOrigem[i];
-   	}
-   	a->_aeroOrigem[strlen(aeroOrigem)+1] = '\0';
+   	strcpy(a->_aeroOrigem, aeroOrigem);
+   	strcpy(a->_aeroDestino, aeroDestino);
+   	printf("aeroporto de origem: %s\n", a->_aeroOrigem);
+   	printf("aeroporto de destino: %s\n", a->_aeroDestino);
+   	getchar();
 
-   	for(i = 0; i < strlen(aeroDestino); i++){
-   		a->_aeroDestino[i] == aeroDestino[i];
-   	}
-   	a->_aeroDestino[strlen(aeroDestino)+1] = '\0';
+
+   	system("cls");
+   	printf("insira o prefixo do voo.\n");
+   	printf("** o prefixo sera usado para alteracoes no sistema **\n");
+   	printf("_ ");
+   	scanf("%[^\n]%*c", a->_prefixo); // armazena o prefixo do voo
 
    	system("cls");
    	printf("Insira o Horario de Partida: \n");
+   	printf("H:M\n");
    	printf("_ ");
-   	scanf("%d%*c%d", &horaPartida, &minutoPartida);
+   	scanf("%d%*c%d", &horaPartida, &minutoPartida); // atualiza as variaveis auxiliares de hora e minuto de partida
 
    	system("cls");
    	printf("Insira o Horario de chegada: \n");
+   	printf("H:M\n");
    	printf("_ ");
-   	scanf("%d%*c%d", &horaChegada, &minutoChegada);
+   	scanf("%d%*c%d", &horaChegada, &minutoChegada); // atualiza as variaveis auxiliares de hora e minuto de chegada
 
-   	ver_horario(&horaPartida, &minutoPartida, &horaChegada, &minutoChegada);
+   	ver_horario(&horaPartida, &minutoPartida, &horaChegada, &minutoChegada); // verifica se os horarios são aceitaveis
    		
-   	a->_horaPartida = horaPartida;
-   	a->_minutoPartida = minutoPartida;
-   	a->_horaChegada = horaChegada;
-   	a->_minutoChegada = minutoChegada;
+   	a->_horaPartida = horaPartida; // atualiza a variavel de hora de partida original
+   	a->_minutoPartida = minutoPartida; // atualiza a variavel de minuto de partida original
+   	a->_horaChegada = horaChegada; // atualiza a variavel de hora de chegada original
+   	a->_minutoChegada = minutoChegada; // atualiza a variavel de minuto de chegada original
 
-   	tempo_voo(horaDuracaoVoo, minDuracaoVoo, horaPartida, horaChegada, minutoPartida, minutoChegada);
+   	tempo_voo(horaDuracaoVoo, minDuracaoVoo, horaPartida, horaChegada, minutoPartida, minutoChegada); // faz a contagem de tempo de voo
 
-   	a->_horaDuracaoVoo = horaDuracaoVoo;
-   	a->_minDuracaoVoo = minDuracaoVoo;
+   	a->_horaDuracaoVoo = horaDuracaoVoo; // atualiza o vetor de hora de duração de voo original
+   	a->_minDuracaoVoo = minDuracaoVoo; // atualiza o vetor de minuto de duração de voo original
 
+   	new_aeronave = inserir_aeronave(new_aeronave); // cria as informaç~
+
+    return a; // retorna a struct com as informações feitas
+}
+
+voo * inserir_aeroporto(voo *a){
+    if(_vazia(a) == 1){ // verifica se a lista é vazia
+        a = (voo *)malloc(sizeof(voo));
+        a = cadastra_porto(a); // cria uma nova lista
+        a->prox = NULL; // aterra a lista
+        return a;
+    }
+    a->prox = inserir_aeroporto(a->prox); // recursivamente procura uma lista vazia
+}
+
+voo * alterar_aeroporto(voo *a, char str[]){
+    voo *aux = a;
+    if(strcmp(a->_prefixo, str) == 0){ // verifica se é a struct desejada
+        a = cadastra_porto(a); // altera as informações
+        return a; // retorna a nova lista
+    
+    } else {
+        
+        for( ; !_vazia(aux) ; aux = aux->prox){ // procura a lista até achar a struct desejada
+            
+            if(strcmp(aux->_prefixo,str)==0){
+                cadastra_porto(aux); // altera as informações
+                break; // retorna a nova lista
+            }
+        }
+    }
     return a;
 }
 
-aeroporto * inserir_aeroporto(aeroporto *a){
-    if(_vazia(a) == 1){
-        a = (aeroporto *)malloc(sizeof(aeroporto));
-        a = cadastra_porto(a);
-        a->prox = NULL;
-        return a;
+voo * exclui_aeroporto(voo *a, char str[]){
+	voo * corredor = a,*aux;
+    if(strcmp(corredor->_prefixo,str) == 0){ // percorre até achar o que deseja
+        aux = corredor->prox;
+        free(corredor); // exclui a struct inteira
+        return aux; // retorna o ponteiro anterior 
     }
-    a->prox = inserir_aeroporto(a->prox);
+    for( ; _vazia(corredor->prox) == 0 ; corredor = corredor->prox){ // ve se a lista é vazia
+        if(strcmp(corredor->prox->_prefixo,str) == 0) break; // caso ache, para na lista
+    }
+    if(corredor->prox){
+        aux = corredor->prox->prox; // marca a lista a ser excluida
+        free(corredor->prox); // exclui a lista marcada
+        corredor->prox = aux; // aterra o ponteiro
+    }
+    return a;
+}
+
+void printa_Voo(voo *a){
+	voo *aux = a;
+	while(!_vazia(aux)) { // enquanto a lista nao for vazia
+		printf("prefixo: %s\n", a->_prefixo);
+		printf("\t[%s] \tpara\t[%s]\n", a->_aeroOrigem, a->_aeroDestino);
+    	printf("\t[%s] \t    \t[%s]\n", a->_siglaOrigem, a->_siglaDestino);
+    	printf("\n");
+    	if(a->prox != 0) printa_Voo(a->prox); // recursivamente printa as outras listas
+	}
+}
+
+void printaVoo(voo *a){
+	system("cls");
+	printf("\t.___________________________.\n");
+    printf("\t|        PREFIXO: %s    |\n", a->_prefixo);
+    printf("\t|     [%s] para   [%s]      |\n", a->_aeroOrigem, a->_aeroDestino);
+    printf("\t|     [%s] sigla  [%s]      |\n", a->_siglaOrigem, a->_siglaDestino);
+    printf("\t|     Saindo as [%d:%d]     |\n", a->_horaPartida, a->_minutoPartida);
+    printf("\t|    Chegando as [%d:%d]    |\n", a->_horaChegada, a->_minutoChegada);
+    printf("\t|Tempo Total de Voo: [%d:%d]|\n", a->_horaDuracaoVoo, a->_minDuracaoVoo);
+    printf("\t|___________________________|\n");
+    if(a->prox != 0) printaVoo(a->prox);
 }
 #endif

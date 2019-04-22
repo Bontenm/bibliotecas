@@ -5,28 +5,87 @@
 #include <string.h>
 #include <locale.h>
 #include <windows.h>
-#include "Terminal.h"
 #include "horario.h"
 #include "aeroporto.h"
 #include "aviao.h"
 
 int opcao;
-aeroporto *new_aeroporto;
-aeronave *new_aeronave;
+voo *new_voo;
 
-/*void open_painel(){
+void segundo_painel(voo *a){
+	system("cls");
+	printf("_____BEM  VINDO_____\n");
+	printf("[1] Terminais de voo\n");
+	printf("[2] Inserir novo Voo\n");
+	printf("[3] editar voo\n");
+	printf("[4] Sair do programa\n");
+	printf("\nO que deseja fazer ?\n");
+	printf("_ ");
+	scanf("%d", &opcao);
+
+	if(opcao == 1){
+		system("cls");
+		printaVoo(a);
+	}
+
+	if(opcao == 2) {
+		system("cls");
+		new_voo = inserir_aeroporto(new_voo);
+		segundo_painel(new_voo);
+	}
+
+	if(opcao == 3){
+		system("cls");
+		printf("_____O que Deseja Alterar_____\n");
+		printf("[1] Alterar Informações do Voo\n");
+		printf("[2] Alterar Informações da Nave\n");
+		printf("_ ");
+		scanf("%d", &opcao);
+		
+		if(opcao == 1) {
+			system("cls");
+			printf("__qual voo deseja alterar__\n");
+			printa_Voo(a);
+		}
+	}
+}
+
+
+int retorno(voo *a){
+	voo *aux = a;
+	setlocale(LC_ALL, "Portuguese");
+	system("cls");
+	printf("_____BEM  VINDO_____\n");
+	printf("[1] Terminais de voo\n");
+	printf("[2] Inserir novo Voo\n");
+	printf("[3] Sair do programa\n");
+	printf("\nO que deseja fazer ?\n");
+	printf("_ ");
+	scanf("%d", &opcao);
+
+	if(opcao == 1) {
+		printaVoo(a);
+	}
+
+	if(opcao == 2) {
+		new_voo = inserir_aeroporto(new_voo);
+		segundo_painel(new_voo);
+	}
 	
-}*/
+	if(opcao == 3) {
+		system("cls");
+		return 0;
+	}
+}
 
-int ver_opcao(int x){
+int ver_opcao(int x,voo *a){
 	if(x == 1) {
-		interface_primaria();
+		system("cls");
+		new_voo = inserir_aeroporto(a);
+		retorno(a);
 	}
+	
 	if(x == 2) {
-		new_aeroporto = inserir_aeroporto(new_aeroporto);
-		new_aeronave = inserir_aeronave(new_aeronave);
-	}
-	if(x == 3) {
 		system("cls");
 		return 0;
 	}
@@ -37,13 +96,12 @@ void interface_Opcao(){
 	system("cls");
 	//tempo_real();
 	printf("_____BEM  VINDO_____\n");
-	printf("[1] Terminais de voo\n");
-	printf("[2] Inserir novo Voo\n");
-	printf("[3] Sair do programa\n");
+	printf("[1] Inserir novo Voo\n");
+	printf("[2] Sair do programa\n");
 	printf("\nO que deseja fazer ?\n");
 	printf("_ ");
 	scanf("%d", &opcao);
-	ver_opcao(opcao);
+	ver_opcao(opcao, new_voo);
 }
 
 #endif
