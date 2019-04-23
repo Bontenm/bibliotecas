@@ -6,6 +6,7 @@
 #include <string.h>
  
 typedef struct no{
+    char prefixo[100];
     char modelo[20];
     double comprimento;
     double altura;
@@ -129,5 +130,13 @@ void printaNave(aeronave *a){
     printf("%d\n",a->quantidade_de_acentos);
     printf("%d\n",a->quantidade_de_banheiros);
     if(a->prox != 0) printaNave(a->prox);
+}
+
+void printa_tipoNave(aeronave *a){
+    aeronave *aux = a;
+    while(vazia(aux) != 0){
+        printf("%s\n", aux->modelo);
+        aux = aux->prox;
+    }
 }
 #endif

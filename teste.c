@@ -6,8 +6,7 @@
 voo * new_porto;
 
 int main(){
-	new_porto = inserir_aeroporto(new_porto);
-	printa_Voo(new_porto);
+	interface_Opcao();
 	
 	return 0;
 }
