@@ -60,7 +60,9 @@ void tempo_voo(int HoraDu, int MinDu, int HoraP, int MinP, int HoraC, int MinC){
 		auxMin %= 60; // faz os minutos restantes corresponderem de acordo
 	}
 
-	auxHora = HoraP - HoraC; // da a quantidade de horas de voo 
+	auxHora = HoraP - HoraC; // da a quantidade de horas de voo
+	if(auxHora > 0) auxHora * (-1);
+
 	HoraDu = auxHora; // atualiza a variavel original
 	MinDu = auxMin; // atualiza a variavel original
 }
